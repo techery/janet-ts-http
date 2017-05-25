@@ -18,9 +18,6 @@ export class RestService implements IService {
   }
 
   dispatch(action: StatefulAction<any>): void {
-
-    this.dispatcher(action.set("state", ActionState.RUNNING));
-
     const request = createHTTPRequestFromAction(action);
 
     const url = request.url;
