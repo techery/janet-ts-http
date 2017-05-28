@@ -3,7 +3,7 @@ import {createHTTPRequestFromAction, isHTTPAction} from "../action/RestAction";
 import {APIClient} from "./APIClient";
 import {JSONDeserializer, JSONSerializer} from "./ContentCodec";
 
-export type TokenProvider = () => string;
+export type TokenProvider = () => string | null;
 
 export class RestService implements IService {
 
@@ -28,7 +28,12 @@ export class RestService implements IService {
 
     headers["Accept"] = "application/json";
     headers["Content-Type"] = "application/json";
-    headers["Authorization"] = this.tokenProvider();
+
+    let token = this.tokenProvider();
+    if (token) {
+      headers["Authorization"] = token;
+    }
+
 
     this.apiClient.fetch(url, method, headers, body).then((response) => {
       const resultAction = action.set("state", ActionState.FINISHED).set("result" as any, response.payload);
