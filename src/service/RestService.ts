@@ -7,7 +7,6 @@ export type TokenProvider = () => string | null;
 
 export class RestService implements IService {
 
-  dispatcher: any = null;
   apiClient: APIClient = new APIClient(new JSONSerializer(), new JSONDeserializer());
 
   constructor(baseURL: string, private tokenProvider: TokenProvider) {
@@ -31,9 +30,9 @@ export class RestService implements IService {
     }
 
     this.apiClient.fetch(url, method, headers, body).then((response) => {
-      this.dispatcher(finishAction(actionHolder.action, response.payload));
+      dispatcher(finishAction(actionHolder.action, response.payload));
     }).catch((error) => {
-      this.dispatcher(failAction(actionHolder.action, error));
+      dispatcher(failAction(actionHolder.action, error));
     });
   }
 
