@@ -1,4 +1,4 @@
-import {action, getClassByActionType} from "janet-ts";
+import {action} from "janet-ts";
 
 import {
   Annotation,
@@ -40,12 +40,7 @@ interface AnnotationConstructor<T> {
 }
 
 function extractRequestInfo(action: any): HTTPRequestInfo | null {
-  const originalClass = getClassByActionType(action._name);
-  if (originalClass) {
-    return Reflect.getMetadata(metaKey, originalClass);
-  } else {
-    return null;
-  }
+  return Reflect.getMetadata(metaKey, action.constructor);
 }
 
 function extractFields<T extends Annotation>(requestInfo: HTTPRequestInfo,
