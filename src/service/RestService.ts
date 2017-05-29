@@ -1,4 +1,4 @@
-import {ActionState, IService, StatefulAction} from "janet-ts";
+import {ActionHolder, BaseAction, failAction, finishAction, IService} from "janet-ts";
 import {createHTTPRequestFromAction, isHTTPAction} from "../action/RestAction";
 import {APIClient} from "./APIClient";
 import {JSONDeserializer, JSONSerializer} from "./ContentCodec";
@@ -14,12 +14,8 @@ export class RestService implements IService {
     this.apiClient.baseURL = baseURL;
   }
 
-  setDispatcher(dispatcher: any): void {
-    this.dispatcher = dispatcher;
-  }
-
-  dispatch(action: StatefulAction<any>): void {
-    const request = createHTTPRequestFromAction(action);
+  dispatch(actionHolder: ActionHolder<BaseAction<any>, any>, dispatcher: any): void {
+    const request = createHTTPRequestFromAction(actionHolder.action);
 
     const url = request.url;
     const method = request.method;
@@ -34,13 +30,10 @@ export class RestService implements IService {
       headers["Authorization"] = token;
     }
 
-
     this.apiClient.fetch(url, method, headers, body).then((response) => {
-      const resultAction = action.set("state", ActionState.FINISHED).set("result" as any, response.payload);
-      this.dispatcher(resultAction);
+      this.dispatcher(finishAction(actionHolder.action, response.payload));
     }).catch((error) => {
-      const resultAction = action.set("state", ActionState.FAILED).set("error", error);
-      this.dispatcher(resultAction);
+      this.dispatcher(failAction(actionHolder.action, error));
     });
   }
 

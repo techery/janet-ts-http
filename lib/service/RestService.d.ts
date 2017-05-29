@@ -1,4 +1,4 @@
-import { IService, StatefulAction } from "janet-ts";
+import { ActionHolder, BaseAction, IService } from "janet-ts";
 import { APIClient } from "./APIClient";
 export declare type TokenProvider = () => string | null;
 export declare class RestService implements IService {
@@ -6,7 +6,6 @@ export declare class RestService implements IService {
     dispatcher: any;
     apiClient: APIClient;
     constructor(baseURL: string, tokenProvider: TokenProvider);
-    setDispatcher(dispatcher: any): void;
-    dispatch(action: StatefulAction<any>): void;
+    dispatch(actionHolder: ActionHolder<BaseAction<any>, any>, dispatcher: any): void;
     accepts(action: any): boolean;
 }
