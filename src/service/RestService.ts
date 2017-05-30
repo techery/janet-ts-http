@@ -32,7 +32,7 @@ export class RestService implements IService {
     this.apiClient.fetch(url, method, headers, body).then((response) => {
       dispatcher(finishAction(actionHolder.action, response.payload));
     }).catch((error) => {
-      dispatcher(failAction(actionHolder.action, error));
+      dispatcher(failAction(actionHolder.action, error.message));
     });
   }
 
