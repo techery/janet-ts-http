@@ -13,6 +13,10 @@ export class RestService implements IService {
     this.apiClient.baseURL = baseURL;
   }
 
+  public setDispatcher(dispatcher: any): void {
+
+  }
+
   dispatch(actionHolder: ActionHolder<BaseAction<any>, any>, dispatcher: any): void {
     const request = createHTTPRequestFromAction(actionHolder.action);
 
