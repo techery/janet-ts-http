@@ -6,6 +6,6 @@ export declare class RestService implements IService {
     apiClient: APIClient;
     constructor(baseURL: string, tokenProvider: TokenProvider);
     setDispatcher(dispatcher: any): void;
-    dispatch(actionHolder: ActionHolder<BaseAction<any>, any>, dispatcher: any): void;
+    dispatch(actionHolder: ActionHolder<BaseAction<any>, any>): Promise<any>;
     accepts(action: any): boolean;
 }
