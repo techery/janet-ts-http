@@ -15,7 +15,7 @@ export class RestService implements IService {
   }
 
   public connect(dispatcher: ActionDispatcher, executor: ActionExecutor): void {
-    
+
   }
 
   dispatch(actionHolder: ActionHolder<BaseAction<any>, any>): Promise<any> {
@@ -36,8 +36,6 @@ export class RestService implements IService {
 
     return this.apiClient.fetch(url, method, headers, body).then((response) => {
       return response.payload;
-    }).catch((error) => {
-      return error;
     });
   }
 
