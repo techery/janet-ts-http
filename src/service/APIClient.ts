@@ -6,7 +6,7 @@ export interface APIResponse {
   payload: any;
 }
 
-class APIError extends Error {
+export class APIError extends Error {
   statusCode: number;
 
   constructor(message: string, statusCode: number) {
