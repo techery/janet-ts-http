@@ -6,8 +6,13 @@ export interface APIResponse {
   payload: any;
 }
 
-class NotAuthorizedError extends Error {
+class APIError extends Error {
+  statusCode: number;
 
+  constructor(message: string, statusCode: number) {
+    super(message);
+    this.statusCode = statusCode;
+  }
 }
 
 export class APIClient {
@@ -42,12 +47,7 @@ export class APIClient {
             payload: payload
           };
         } else {
-          switch (response.status) {
-            case 401:
-              throw new NotAuthorizedError(payload.error);
-            default:
-              throw new Error(payload.error);
-          }
+          throw new APIError(response.status, payload.error)
         }
       });
     });
