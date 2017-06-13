@@ -47,7 +47,7 @@ export class APIClient {
             payload: payload
           };
         } else {
-          throw new APIError(response.status, payload.error)
+          throw new APIError(payload.error, response.status);
         }
       });
     });
