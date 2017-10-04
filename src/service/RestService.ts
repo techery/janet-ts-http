@@ -1,17 +1,16 @@
 import {ActionDispatcher, ActionExecutor, ActionHolder, BaseAction, IService} from "janet-ts";
 import {createHTTPRequestFromAction, isHTTPAction} from "../action/RestAction";
-import {APIClient} from "./APIClient";
+import {APICallWrapper, APIClient} from "./APIClient";
 import {JSONDeserializer, JSONSerializer} from "./ContentCodec";
 
 export type TokenProvider = () => string | null;
 
 export class RestService implements IService {
 
+  private apiClient: APIClient;
 
-  apiClient: APIClient = new APIClient(new JSONSerializer(), new JSONDeserializer());
-
-  constructor(baseURL: string, private tokenProvider: TokenProvider) {
-    this.apiClient.baseURL = baseURL;
+  constructor(baseURL: string, private tokenProvider: TokenProvider, apiCallWrapper?: APICallWrapper) {
+    this.apiClient = new APIClient(baseURL, new JSONSerializer(), new JSONDeserializer(), apiCallWrapper);
   }
 
   public connect(dispatcher: ActionDispatcher, executor: ActionExecutor): void {

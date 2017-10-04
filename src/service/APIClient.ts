@@ -15,19 +15,37 @@ export class APIError extends Error {
   }
 }
 
+export type APICall = () => Promise<APIResponse>;
+
+export interface APICallWrapper {
+  runApiCall(call: APICall): Promise<APIResponse>;
+}
+
+const defaultAPICallWrapper: APICallWrapper = {
+  runApiCall: (call: APICall) => {
+    return call();
+  }
+};
+
 export class APIClient {
 
-  public baseURL?: string = undefined;
-
-  constructor(private serializer: Serializer,
-              private deserializer: Deserializer) {
+  constructor(public baseURL: string,
+              private serializer: Serializer,
+              private deserializer: Deserializer,
+              protected apiCallWrapper: APICallWrapper = defaultAPICallWrapper) {
   }
 
-  buildURL(endpoint: string): string {
+  public fetch(url: string, method: string, headers: any, body?: any): Promise<APIResponse> {
+    return this.apiCallWrapper.runApiCall(() => {
+      return this.execFetch(url, method, headers, body);
+    });
+  }
+
+  private buildURL(endpoint: string): string {
     return this.baseURL + endpoint;
   }
 
-  fetch(url: string, method: string, headers: any, body?: any): Promise<APIResponse> {
+  private execFetch(url: string, method: string, headers: any, body?: any): Promise<APIResponse> {
     let params: any = {
       method: method,
       mode: 'cors',
