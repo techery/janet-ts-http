@@ -2,7 +2,7 @@
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 var janet_ts_1 = require("janet-ts");
 var HTTPAnnotation_1 = require("./HTTPAnnotation");
 __export(require("./HTTPAnnotation"));
@@ -47,7 +47,7 @@ function parseHTTPAction(httpAction) {
         pathParams: extractFields(requestInfo, HTTPAnnotation_1.PathParamAnnotation),
         requestHeaders: extractFields(requestInfo, HTTPAnnotation_1.RequestHeaderAnnotation),
         responseHeaders: extractFields(requestInfo, HTTPAnnotation_1.ResponseHeaderAnnotation),
-        body: body
+        body: body,
     };
 }
 exports.parseHTTPAction = parseHTTPAction;
@@ -80,7 +80,7 @@ function createHTTPRequestFromScheme(httpAction, scheme) {
     var toParams = function (annotation) {
         return {
             name: annotation.name,
-            value: annotation.propertyAccessor.readValue(httpAction)
+            value: annotation.propertyAccessor.readValue(httpAction),
         };
     };
     var pathParams = scheme.pathParams.map(toParams);
@@ -101,7 +101,7 @@ function createHTTPRequestFromScheme(httpAction, scheme) {
         method: scheme.method,
         queryParams: queryParams,
         headers: headers,
-        body: body
+        body: body,
     };
 }
 exports.createHTTPRequestFromScheme = createHTTPRequestFromScheme;
@@ -116,7 +116,7 @@ function HttpAction(url, method) {
         var metadata = Reflect.getMetadata(exports.metaKey, target);
         if (!metadata) {
             metadata = {
-                annotations: {}
+                annotations: {},
             };
         }
         metadata.url = url;

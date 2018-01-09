@@ -1,13 +1,15 @@
+/* tslint:disable:no-deep-module-imports */
+// tslint:disable:max-params
 import "whatwg-fetch";
-import {Deserializer, Serializer} from "./ContentCodec";
+import { Serializer } from "./ContentCodec";
 
 export interface APIResponse {
-  statusCode: number;
-  payload: any;
+  readonly statusCode: number;
+  readonly payload: any;
 }
 
 export class APIError extends Error {
-  statusCode: number;
+  public readonly statusCode: number;
 
   constructor(message: string, statusCode: number) {
     super(message);
@@ -15,59 +17,76 @@ export class APIError extends Error {
   }
 }
 
-export type APICall = () => Promise<APIResponse>;
+export class APIFormError implements Error {
+  public readonly name: string;
+  public readonly message: string;
+  public readonly statusCode: number;
+  public readonly fieldErrors: any;
 
-export interface APICallWrapper {
-  runApiCall(call: APICall): Promise<APIResponse>;
+  constructor(errors: any, statusCode: number) {
+    this.message = "Form validation error";
+    this.statusCode = statusCode;
+    this.fieldErrors = errors;
+  }
+
+  public getByField(name: string): string {
+    if (!this.fieldErrors) {
+      return "";
+    }
+
+    const fieldError = this.fieldErrors[name];
+
+    if (!fieldError) {
+      return "";
+    }
+
+    return fieldError.map((message: string) => {
+      return message;
+    }).toString();
+  }
 }
 
-const defaultAPICallWrapper: APICallWrapper = {
-  runApiCall: (call: APICall) => {
-    return call();
-  }
+export type APICall = () => Promise<APIResponse>;
+export type APICallWrapper = (call: APICall) => Promise<APIResponse>;
+export type ResponseMapper = (response: Response) => APIResponse | Promise<APIResponse>;
+
+const defaultAPICallWrapper: APICallWrapper = (call: APICall) => {
+  return call();
 };
 
 export class APIClient {
-
   constructor(public baseURL: string,
               private serializer: Serializer,
-              private deserializer: Deserializer,
+              private responseMapper: ResponseMapper,
               protected apiCallWrapper: APICallWrapper = defaultAPICallWrapper) {
   }
 
   public fetch(url: string, method: string, headers: any, body?: any): Promise<APIResponse> {
-    return this.apiCallWrapper.runApiCall(() => {
+    return this.apiCallWrapper(() => {
       return this.execFetch(url, method, headers, body);
     });
   }
 
   private buildURL(endpoint: string): string {
-    return this.baseURL + endpoint;
+    if (endpoint.startsWith("http")) {
+      return endpoint;
+    } else {
+      return this.baseURL + endpoint;
+    }
   }
 
   private execFetch(url: string, method: string, headers: any, body?: any): Promise<APIResponse> {
-    let params: any = {
+    const params: any = {
       method: method,
-      mode: 'cors',
-      headers: headers
+      mode: "cors",
+      headers: headers,
+      cache: "default",
     };
 
-    if (method == "POST" || method == "PUT") {
+    if (method === "POST" || method === "PUT") {
       params.body = this.serializer.serialize(body);
     }
 
-    return fetch(this.buildURL(url), params).then((response: any) => {
-      return response.text().then((responseString: string) => {
-        const payload = this.deserializer.deserialize(responseString);
-        if (response.ok) {
-          return {
-            statusCode: response.status,
-            payload: payload
-          };
-        } else {
-          throw new APIError(payload.error, response.status);
-        }
-      });
-    });
+    return fetch(this.buildURL(url), params).then(this.responseMapper);
   }
 }

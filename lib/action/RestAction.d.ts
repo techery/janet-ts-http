@@ -3,28 +3,28 @@ export * from "./HTTPAnnotation";
 export declare type Method = "GET" | "POST" | "PUT" | "DELETE" | "HEAD";
 export declare const metaKey = "META::HTTPAction";
 export interface RequestScheme {
-    url: string;
-    method: Method;
-    formFields: FieldAnnotation[];
-    queryParams: QueryAnnotation[];
-    pathParams: PathParamAnnotation[];
-    requestHeaders: RequestHeaderAnnotation[];
-    responseHeaders: ResponseHeaderAnnotation[];
-    body: BodyAnnotation | null;
+    readonly url: string;
+    readonly method: Method;
+    readonly formFields: ReadonlyArray<FieldAnnotation>;
+    readonly queryParams: ReadonlyArray<QueryAnnotation>;
+    readonly pathParams: ReadonlyArray<PathParamAnnotation>;
+    readonly requestHeaders: ReadonlyArray<RequestHeaderAnnotation>;
+    readonly responseHeaders: ReadonlyArray<ResponseHeaderAnnotation>;
+    readonly body: BodyAnnotation | null;
 }
-export declare function isHTTPAction(action: any): boolean;
-export declare function parseHTTPAction(action: any): RequestScheme;
+export declare function isHTTPAction(httpAction: any): boolean;
+export declare function parseHTTPAction(httpAction: any): RequestScheme;
 export interface NamedValue {
-    name: string;
-    value: any;
+    readonly name: string;
+    readonly value: any;
 }
 export interface HTTPRequest {
-    url: string;
-    method: Method;
-    queryParams: NamedValue[];
-    headers: any;
-    body: any;
+    readonly url: string;
+    readonly method: Method;
+    readonly queryParams: ReadonlyArray<NamedValue>;
+    readonly headers: any;
+    readonly body: any;
 }
-export declare function createHTTPRequestFromScheme(action: any, scheme: RequestScheme): HTTPRequest;
-export declare function createHTTPRequestFromAction(action: any): HTTPRequest;
+export declare function createHTTPRequestFromScheme(httpAction: any, scheme: RequestScheme): HTTPRequest;
+export declare function createHTTPRequestFromAction(httpAction: any): HTTPRequest;
 export declare function HttpAction(url: string, method?: Method): ClassDecorator;

@@ -1,6 +1,6 @@
 "use strict";
-exports.__esModule = true;
-var JSONSerializer = (function () {
+Object.defineProperty(exports, "__esModule", { value: true });
+var JSONSerializer = /** @class */ (function () {
     function JSONSerializer() {
     }
     JSONSerializer.prototype.serialize = function (content) {

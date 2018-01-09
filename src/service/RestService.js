@@ -1,14 +1,15 @@
 "use strict";
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 var RestAction_1 = require("../action/RestAction");
 var APIClient_1 = require("./APIClient");
 var ContentCodec_1 = require("./ContentCodec");
-var RestService = (function () {
+var RestService = /** @class */ (function () {
     function RestService(baseURL, tokenProvider, responseMapper, apiCallWrapper) {
         this.tokenProvider = tokenProvider;
         this.apiClient = new APIClient_1.APIClient(baseURL, new ContentCodec_1.JSONSerializer(), responseMapper, apiCallWrapper);
     }
     RestService.prototype.connect = function (dispatcher, executor) {
+        // Empty
     };
     RestService.prototype.dispatch = function (actionHolder) {
         var request = RestAction_1.createHTTPRequestFromAction(actionHolder.action);

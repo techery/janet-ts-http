@@ -5,13 +5,14 @@ export class PropertyAccessor<T> {
 
   }
 
-  readValue(target: any): T {
+  public readValue(target: any): T {
     return target[this.key];
   }
 }
 
 export class Annotation {
-  propertyAccessor: PropertyAccessor<any>;
+  // tslint:disable-next-line:readonly-keyword
+  public propertyAccessor: PropertyAccessor<any>;
 }
 
 export function makePropertyDecorator(annotation: Annotation): PropertyDecorator {
@@ -21,7 +22,7 @@ export function makePropertyDecorator(annotation: Annotation): PropertyDecorator
 
     if (!metadata) {
       metadata = {
-        annotations: {}
+        annotations: {},
       };
     }
 
@@ -29,7 +30,7 @@ export function makePropertyDecorator(annotation: Annotation): PropertyDecorator
       metadata.annotations = {};
     }
 
-    let annotationName = (annotation.constructor as any).name;
+    const annotationName = (annotation.constructor as any).name;
 
     if (!metadata.annotations[annotationName]) {
       metadata.annotations[annotationName] = [];
@@ -48,7 +49,7 @@ export class BodyAnnotation extends Annotation {
 }
 
 export class NamedAnnotation extends Annotation {
-  name: string;
+  public readonly name: string;
 
   constructor(name: string) {
     super();

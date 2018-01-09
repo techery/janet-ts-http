@@ -9,9 +9,11 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
+/* tslint:disable:no-deep-module-imports */
+// tslint:disable:max-params
 require("whatwg-fetch");
-var APIError = (function (_super) {
+var APIError = /** @class */ (function (_super) {
     __extends(APIError, _super);
     function APIError(message, statusCode) {
         var _this = _super.call(this, message) || this;
@@ -21,7 +23,7 @@ var APIError = (function (_super) {
     return APIError;
 }(Error));
 exports.APIError = APIError;
-var APIFormError = (function () {
+var APIFormError = /** @class */ (function () {
     function APIFormError(errors, statusCode) {
         this.message = "Form validation error";
         this.statusCode = statusCode;
@@ -45,7 +47,7 @@ exports.APIFormError = APIFormError;
 var defaultAPICallWrapper = function (call) {
     return call();
 };
-var APIClient = (function () {
+var APIClient = /** @class */ (function () {
     function APIClient(baseURL, serializer, responseMapper, apiCallWrapper) {
         if (apiCallWrapper === void 0) { apiCallWrapper = defaultAPICallWrapper; }
         this.baseURL = baseURL;
@@ -72,7 +74,7 @@ var APIClient = (function () {
             method: method,
             mode: "cors",
             headers: headers,
-            cache: "default"
+            cache: "default",
         };
         if (method === "POST" || method === "PUT") {
             params.body = this.serializer.serialize(body);

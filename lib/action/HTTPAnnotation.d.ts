@@ -10,7 +10,7 @@ export declare function makePropertyDecorator(annotation: Annotation): PropertyD
 export declare class BodyAnnotation extends Annotation {
 }
 export declare class NamedAnnotation extends Annotation {
-    name: string;
+    readonly name: string;
     constructor(name: string);
 }
 export declare class FieldAnnotation extends NamedAnnotation {

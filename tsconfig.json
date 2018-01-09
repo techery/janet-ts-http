@@ -1,5 +1,9 @@
 {
   "compilerOptions": {
+    "lib": [
+      "es6",
+      "dom"
+    ],
     "declaration": true,
     "module": "commonjs",
     "moduleResolution": "node",

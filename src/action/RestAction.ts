@@ -8,7 +8,7 @@ import {
   PathParamAnnotation,
   QueryAnnotation,
   RequestHeaderAnnotation,
-  ResponseHeaderAnnotation
+  ResponseHeaderAnnotation,
 } from "./HTTPAnnotation";
 
 export * from "./HTTPAnnotation";
@@ -18,34 +18,34 @@ export type Method = "GET" | "POST" | "PUT" | "DELETE" | "HEAD";
 export const metaKey = "META::HTTPAction";
 
 export interface RequestScheme {
-  url: string;
-  method: Method;
-  formFields: FieldAnnotation[];
-  queryParams: QueryAnnotation[];
-  pathParams: PathParamAnnotation[];
-  requestHeaders: RequestHeaderAnnotation[];
-  responseHeaders: ResponseHeaderAnnotation[];
-  body: BodyAnnotation | null;
+  readonly url: string;
+  readonly method: Method;
+  readonly formFields: ReadonlyArray<FieldAnnotation>;
+  readonly queryParams: ReadonlyArray<QueryAnnotation>;
+  readonly pathParams: ReadonlyArray<PathParamAnnotation>;
+  readonly requestHeaders: ReadonlyArray<RequestHeaderAnnotation>;
+  readonly responseHeaders: ReadonlyArray<ResponseHeaderAnnotation>;
+  readonly body: BodyAnnotation | null;
 }
 
 interface HTTPRequestInfo {
-  url: string;
-  method: Method;
-  annotations: any;
+  readonly url: string;
+  readonly method: Method;
+  readonly annotations: any;
 }
 
 interface AnnotationConstructor<T> {
-  new (...params: any[]): T;
-  name?: string;
+  new (...mutableParams: any[]): T;
+  readonly name?: string;
 }
 
-function extractRequestInfo(action: any): HTTPRequestInfo | null {
-  return Reflect.getMetadata(metaKey, action.constructor);
+function extractRequestInfo(httpAction: any): HTTPRequestInfo | null {
+  return Reflect.getMetadata(metaKey, httpAction.constructor);
 }
 
 function extractFields<T extends Annotation>(requestInfo: HTTPRequestInfo,
-                                             annotationType: AnnotationConstructor<T>): T[] {
-  const annotations = requestInfo.annotations[annotationType.name];
+                                             annotationType: AnnotationConstructor<T>): ReadonlyArray<T> {
+  const annotations = requestInfo.annotations[annotationType.name!];
   if (annotations) {
     return annotations;
   } else {
@@ -63,16 +63,16 @@ function extractField<T extends Annotation>(requestInfo: HTTPRequestInfo,
   }
 }
 
-export function isHTTPAction(action: any): boolean {
-  const requestInfo = extractRequestInfo(action);
+export function isHTTPAction(httpAction: any): boolean {
+  const requestInfo = extractRequestInfo(httpAction);
   return requestInfo != null;
 }
 
-export function parseHTTPAction(action: any): RequestScheme {
+export function parseHTTPAction(httpAction: any): RequestScheme {
 
-  const requestInfo = extractRequestInfo(action);
+  const requestInfo = extractRequestInfo(httpAction);
   if (requestInfo == null) {
-    throw new Error("Invalid HTTP Action:" + action);
+    throw new Error("Invalid HTTP Action:" + httpAction);
   }
 
   const body = extractField(requestInfo, BodyAnnotation);
@@ -85,24 +85,24 @@ export function parseHTTPAction(action: any): RequestScheme {
     pathParams: extractFields(requestInfo, PathParamAnnotation),
     requestHeaders: extractFields(requestInfo, RequestHeaderAnnotation),
     responseHeaders: extractFields(requestInfo, ResponseHeaderAnnotation),
-    body: body
+    body: body,
   };
 }
 
 export interface NamedValue {
-  name: string;
-  value: any;
+  readonly name: string;
+  readonly value: any;
 }
 
 export interface HTTPRequest {
-  url: string;
-  method: Method;
-  queryParams: NamedValue[];
-  headers: any;
-  body: any;
+  readonly url: string;
+  readonly method: Method;
+  readonly queryParams: ReadonlyArray<NamedValue>;
+  readonly headers: any;
+  readonly body: any;
 }
 
-function applyPathParams(url: string, params: NamedValue[]): string {
+function applyPathParams(url: string, params: ReadonlyArray<NamedValue>): string {
   let updatedURL = url;
 
   params.forEach((pathParam: NamedValue) => {
@@ -112,7 +112,7 @@ function applyPathParams(url: string, params: NamedValue[]): string {
   return updatedURL;
 }
 
-function applyQueryParams(url: string, params: NamedValue[]): string {
+function applyQueryParams(url: string, params: ReadonlyArray<NamedValue>): string {
   if (params.length > 0) {
     const queryPairs = params.map((param: NamedValue) => {
       return param.name + "=" + param.value;
@@ -124,7 +124,7 @@ function applyQueryParams(url: string, params: NamedValue[]): string {
   }
 }
 
-function toHash(values: NamedValue[]): any {
+function toHash(values: ReadonlyArray<NamedValue>): any {
   const hash: any = {};
 
   values.forEach((value: NamedValue) => {
@@ -134,12 +134,12 @@ function toHash(values: NamedValue[]): any {
   return hash;
 }
 
-export function createHTTPRequestFromScheme(action: any, scheme: RequestScheme): HTTPRequest {
+export function createHTTPRequestFromScheme(httpAction: any, scheme: RequestScheme): HTTPRequest {
 
   const toParams = (annotation: NamedAnnotation): NamedValue => {
     return {
       name: annotation.name,
-      value: annotation.propertyAccessor.readValue(action)
+      value: annotation.propertyAccessor.readValue(httpAction),
     };
   };
 
@@ -148,7 +148,7 @@ export function createHTTPRequestFromScheme(action: any, scheme: RequestScheme):
   const headers: any = toHash(scheme.requestHeaders.map(toParams));
   const formFields: NamedValue[] = scheme.formFields.map(toParams);
 
-  let body = scheme.body != null ? scheme.body.propertyAccessor.readValue(action) : null;
+  let body = scheme.body != null ? scheme.body.propertyAccessor.readValue(httpAction) : null;
 
   if (!body && formFields.length > 0) {
     body = {};
@@ -165,13 +165,13 @@ export function createHTTPRequestFromScheme(action: any, scheme: RequestScheme):
     method: scheme.method,
     queryParams: queryParams,
     headers: headers,
-    body: body
+    body: body,
   };
 }
 
-export function createHTTPRequestFromAction(action: any): HTTPRequest {
-  const scheme = parseHTTPAction(action);
-  return createHTTPRequestFromScheme(action, scheme);
+export function createHTTPRequestFromAction(httpAction: any): HTTPRequest {
+  const scheme = parseHTTPAction(httpAction);
+  return createHTTPRequestFromScheme(httpAction, scheme);
 }
 
 export function HttpAction(url: string, method: Method = "GET"): ClassDecorator {
@@ -181,7 +181,7 @@ export function HttpAction(url: string, method: Method = "GET"): ClassDecorator 
 
     if (!metadata) {
       metadata = {
-        annotations: {}
+        annotations: {},
       };
     }
 

@@ -1,23 +1,23 @@
-import {ActionDispatcher, ActionExecutor, ActionHolder, BaseAction, IService} from "janet-ts";
-import {createHTTPRequestFromAction, isHTTPAction} from "../action/RestAction";
-import {APICallWrapper, APIClient} from "./APIClient";
-import {JSONDeserializer, JSONSerializer} from "./ContentCodec";
+import { ActionDispatcher, ActionExecutor, ActionHolder, BaseAction, IService } from "janet-ts";
+import { createHTTPRequestFromAction, isHTTPAction } from "../action/RestAction";
+import { APICallWrapper, APIClient, ResponseMapper } from "./APIClient";
+import { JSONSerializer } from "./ContentCodec";
 
 export type TokenProvider = () => string | null;
 
 export class RestService implements IService {
 
-  private apiClient: APIClient;
+  private readonly apiClient: APIClient;
 
-  constructor(baseURL: string, private tokenProvider: TokenProvider, apiCallWrapper?: APICallWrapper) {
-    this.apiClient = new APIClient(baseURL, new JSONSerializer(), new JSONDeserializer(), apiCallWrapper);
+  constructor(baseURL: string, private tokenProvider: TokenProvider, responseMapper: ResponseMapper, apiCallWrapper?: APICallWrapper) {
+    this.apiClient = new APIClient(baseURL, new JSONSerializer(), responseMapper, apiCallWrapper);
   }
 
   public connect(dispatcher: ActionDispatcher, executor: ActionExecutor): void {
-
+    // Empty
   }
 
-  dispatch(actionHolder: ActionHolder<BaseAction<any>, any>): Promise<any> {
+  public dispatch(actionHolder: ActionHolder<BaseAction<any>, any>): Promise<any> {
     const request = createHTTPRequestFromAction(actionHolder.action);
 
     const url = request.url;
@@ -25,11 +25,13 @@ export class RestService implements IService {
     const body = request.body;
     const headers: any = request.headers;
 
-    headers["Accept"] = "application/json";
-    headers["Content-Type"] = "application/json";
+    headers["Accept"] = headers["Accept"] || "application/json";
+    headers["Content-Type"] = headers["Content-Type"] || "application/json";
 
-    let token = this.tokenProvider();
-    if (token) {
+    const skipAuth = request.headers["Accept"] !== "application/json";
+
+    const token = this.tokenProvider();
+    if (token && !skipAuth) {
       headers["Authorization"] = token;
     }
 
@@ -38,7 +40,7 @@ export class RestService implements IService {
     });
   }
 
-  accepts(action: any): boolean {
+  public accepts(action: any): boolean {
     return isHTTPAction(action);
   }
 }

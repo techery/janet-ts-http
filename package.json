@@ -36,26 +36,10 @@
     "rimraf": "^2.0.0",
     "ts-node": "^3.0.0",
     "tslint": "^5.0.0",
-    "typescript": "^2.0.0",
+    "typescript": "2.6.2",
     "coveralls": "^2.0.0"
   },
   "engines": {
     "node": ">=4.0.0"
-  },
-  "nyc": {
-    "include": [
-      "src/**/*.ts"
-    ],
-    "exclude": [
-      "lib"
-    ],
-    "extension": [
-      ".ts"
-    ],
-    "require": [
-      "ts-node/register"
-    ],
-    "reporter": [],
-    "all": true
   }
 }
