@@ -1,4 +1,4 @@
-import { ActionDispatcher, ActionExecutor, ActionHolder, BaseAction, IService } from "janet-ts";
+import { ActionDispatcher, ActionExecutor, StateProvider, ActionHolder, BaseAction, IService } from "janet-ts";
 import { createHTTPRequestFromAction, isHTTPAction } from "../action/RestAction";
 import { APICallWrapper, APIClient, ResponseMapper } from "./APIClient";
 import { JSONSerializer } from "./ContentCodec";
@@ -13,7 +13,7 @@ export class RestService implements IService {
     this.apiClient = new APIClient(baseURL, new JSONSerializer(), responseMapper, apiCallWrapper);
   }
 
-  public connect(dispatcher: ActionDispatcher, executor: ActionExecutor): void {
+  public connect(dispatcher: ActionDispatcher, executor: ActionExecutor, stateProvider: StateProvider): void {
     // Empty
   }
 

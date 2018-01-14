@@ -13,7 +13,8 @@
     "removeComments": true,
     "typeRoots": [
       "./node_modules/@types"
-    ]
+    ],
+    "experimentalDecorators": true
   },
   "include": [
     "src/**/*"
