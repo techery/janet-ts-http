@@ -23,7 +23,7 @@
     "watch:test": "npm run test -- --watch"
   },
   "dependencies": {
-    "janet-ts": "git+https://github.com/techery/janet-ts.git#master",
+    "janet-ts": "git+https://github.com/techery/janet-ts.git#b399a129bdd0534d6ab461f4f8b24c83f08fa1a8",
     "whatwg-fetch": "^2.0.3"
   },
   "devDependencies": {
